@@ -1,26 +1,17 @@
 from app.models import db, Role, environment, SCHEMA
-from werkzeug.security import generate_password_hash
-from faker import Faker
-
-# Adds a demo user, you can add other users here if you want
-fa = Faker()
+roles = [
+    Role(role_name='student', access_level=1),
+    Role(role_name='instructor', access_level=2),
+    Role(role_name='administrator', access_level=3),
+    Role(role_name='superuser', access_level=99)
+]
 
 
 def seed_roles():
-    roles = [
-        Role(role_name='student', access_level=1),
-        Role(role_name='instructor', access_level=2),
-        Role(role_name='administrator', access_level=3),
-        Role(role_name='superuser', access_level=99)
-    ]
     for role in roles:
         db.session.add(role)
-        print(f'adding role: {role}')
 
-    print('Commit to db:')
     db.session.commit()
-
-    print('Seed Roles complete')
     return
 
 

@@ -4,6 +4,8 @@ from faker import Faker
 
 # Adds a demo user, you can add other users here if you want
 fa = Faker()
+demo = User(username='Demo', email='demo@aa.io',
+            password='password', role_id=1)
 
 
 def generate_user():
@@ -16,18 +18,11 @@ def generate_user():
 
 
 def seed_users():
-    demo = User(username='Demo', email='demo@aa.io',
-                password='password', role_id=1)
     db.session.add(demo)
-    users = [generate_user() for _ in range(9)]
-    for user in users:
-        print(f'Adding user: {user.to_dict()} \n')
+    for user in [generate_user() for _ in range(9)]:
         db.session.add(user)
 
-    print('Commit to db:')
     db.session.commit()
-
-    print('Seed Users complete')
     return
 
 
