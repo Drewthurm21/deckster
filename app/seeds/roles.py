@@ -1,4 +1,4 @@
-from app.models import db, User, environment, SCHEMA
+from app.models import db, Role, environment, SCHEMA
 from werkzeug.security import generate_password_hash
 from faker import Faker
 
@@ -6,28 +6,21 @@ from faker import Faker
 fa = Faker()
 
 
-def generate_user():
-    return User(
-        username=fa.name(),
-        email=fa.ascii_free_email(),
-        role_id=1,
-        hashed_password=generate_password_hash(fa.password())
-    )
-
-
-def seed_users():
-    demo = User(username='Demo', email='demo@aa.io',
-                password='password', role_id=1)
-    db.session.add(demo)
-    users = [generate_user() for _ in range(9)]
-    for user in users:
-        print(f'Adding user: {user.to_dict()} \n')
-        db.session.add(user)
+def seed_roles():
+    roles = [
+        Role(role_name='student', access_level=1),
+        Role(role_name='instructor', access_level=2),
+        Role(role_name='administrator', access_level=3),
+        Role(role_name='superuser', access_level=99)
+    ]
+    for role in roles:
+        db.session.add(role)
+        print(f'adding role: {role}')
 
     print('Commit to db:')
     db.session.commit()
 
-    print('Seed Users complete')
+    print('Seed Roles complete')
     return
 
 
@@ -37,11 +30,11 @@ def seed_users():
 # incrementing primary key, CASCADE deletes any dependent entities.  With
 # sqlite3 in development you need to instead use DELETE to remove all data and
 # it will reset the primary keys for you as well.
-def undo_users():
+def undo_roles():
     if environment == "production":
         db.session.execute(
-            f"TRUNCATE table {SCHEMA}.users RESTART IDENTITY CASCADE;")
+            f"TRUNCATE table {SCHEMA}.roles RESTART IDENTITY CASCADE;")
     else:
-        db.session.execute("DELETE FROM users")
+        db.session.execute("DELETE FROM roles")
 
     db.session.commit()
