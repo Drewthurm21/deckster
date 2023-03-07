@@ -1,19 +1,29 @@
 from app.models import db, User, environment, SCHEMA
-
+from werkzeug.security import generate_password_hash
+from faker import Faker
 
 # Adds a demo user, you can add other users here if you want
-def seed_users():
-    demo = User(
-        username='Demo', email='demo@aa.io', password='password')
-    marnie = User(
-        username='marnie', email='marnie@aa.io', password='password')
-    bobbie = User(
-        username='bobbie', email='bobbie@aa.io', password='password')
+fa = Faker()
+demo = User(username='Demo', email='demo@aa.io',
+            password='password', role_id=1)
 
+
+def generate_user():
+    return User(
+        username=fa.name(),
+        email=fa.ascii_free_email(),
+        role_id=1,
+        hashed_password=generate_password_hash(fa.password())
+    )
+
+
+def seed_users():
     db.session.add(demo)
-    db.session.add(marnie)
-    db.session.add(bobbie)
+    for user in [generate_user() for _ in range(9)]:
+        db.session.add(user)
+
     db.session.commit()
+    return
 
 
 # Uses a raw SQL query to TRUNCATE or DELETE the users table. SQLAlchemy doesn't
@@ -24,8 +34,9 @@ def seed_users():
 # it will reset the primary keys for you as well.
 def undo_users():
     if environment == "production":
-        db.session.execute(f"TRUNCATE table {SCHEMA}.users RESTART IDENTITY CASCADE;")
+        db.session.execute(
+            f"TRUNCATE table {SCHEMA}.users RESTART IDENTITY CASCADE;")
     else:
         db.session.execute("DELETE FROM users")
-        
+
     db.session.commit()

@@ -1,6 +1,7 @@
-from .db import db, environment, SCHEMA, add_prefix_for_prod
+from .db import db, environment, SCHEMA
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy.orm import relationship
 
 
 class User(db.Model, UserMixin):
@@ -9,10 +10,19 @@ class User(db.Model, UserMixin):
     if environment == "production":
         __table_args__ = {'schema': SCHEMA}
 
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), nullable=False, unique=True)
     email = db.Column(db.String(255), nullable=False, unique=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
     hashed_password = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.String(255), nullable=True)
+
+    # Relationships
+    user_role = relationship('Role', back_populates='users')
+    decks = relationship('Deck', back_populates='owner', )
+
+    # Methods
 
     @property
     def password(self):
@@ -29,5 +39,6 @@ class User(db.Model, UserMixin):
         return {
             'id': self.id,
             'username': self.username,
-            'email': self.email
+            'email': self.email,
+            'role_id': self.role_id
         }
