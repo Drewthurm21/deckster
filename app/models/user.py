@@ -20,6 +20,9 @@ class User(db.Model, UserMixin):
 
     # Relationships
     user_role = relationship('Role', back_populates='users')
+    decks = relationship('Deck', back_populates='owner', )
+
+    # Methods
 
     @property
     def password(self):

@@ -10,7 +10,7 @@ class Role(db.Model):
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
-    role_name = db.Column(db.String(40), nullable=False)
+    role_name = db.Column(db.String(40), nullable=False, unique=True)
     access_level = db.Column(db.Integer, nullable=False)
 
     # Relationships
